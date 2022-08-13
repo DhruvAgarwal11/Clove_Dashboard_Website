@@ -14,7 +14,7 @@ var paymentMethodId;
 var customerId;
 var subItem;
 var quantity;
-var urlAWS = 'https://j8w2jucdk4.execute-api.us-west-1.amazonaws.com/default/clove_dashboard?stripe=true';
+var urlAWS = 'https://morning-beyond-26570.herokuapp.com/https://j8w2jucdk4.execute-api.us-west-1.amazonaws.com/default/clove_dashboard?stripe=true';
 
 let priceInfo = {
   basic: {
