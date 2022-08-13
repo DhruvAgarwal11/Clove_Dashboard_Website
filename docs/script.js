@@ -1,6 +1,11 @@
 import { updatePaid } from './js/receiveData.js';
 
 let stripe, customer, price, card, subscriptionId;
+let headers = new Headers();
+
+headers.append('Content-Type', 'application/json');
+headers.append('Accept', 'application/json');
+headers.append('Origin','http://dashboard.joinclove.org');
 var billingEmail;
 var priceName;
 var amount;
@@ -832,9 +837,7 @@ function retrieveCustomerPaymentMethod(paymentMethodId) {
 function getConfig() {
   var urlAWSgetConfig = urlAWS + '&typeOfRequest=config';
   console.log(urlAWSgetConfig);
-  return fetch(urlAWSgetConfig, {headers: {
-    'Content-Type': 'application/json',
-  },}).then((response) => {
+  return fetch(urlAWSgetConfig, {mode: "cors", method: 'get', headers: headers,}).then((response) => {
     console.log(response);
     return response.json(); 
     //stripeElements(result.publishableKey);
