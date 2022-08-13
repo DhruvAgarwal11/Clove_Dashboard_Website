@@ -4,48 +4,54 @@ const { resolve } = require('path');
 const bodyParser = require('body-parser');
 // Replace if using a different env file or config
 require('dotenv').config({ path: './.env' });
+var ARBOR_DAY_FOUNDATION="price_1LW4z5JLT225WxyGRrX1TcQd"
+var RAIN_FOREST_TRUST="price_1LW4xqJLT225WxyG7OaExFAj"
+var STATIC_DIR="docs"
+var STRIPE_PUBLISHABLE_KEY="pk_live_51LV1ErJLT225WxyGX7ucx2fxyyfJPZsesEH7m8sn8i8GIST7UIyGns22l6GT5o0Yc0cSwor2jfzsVofbAqCSEhI600y8VJa2A0"
+var STRIPE_SECRET_KEY="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"
+var STRIPE_WEBHOOK_SECRET="whsec_a023ed719faf2ac2ce973e9d61eebb36f008a49da246173a045d6cd033e9d558"
 
-if (
-  !process.env.STRIPE_SECRET_KEY ||
-  !process.env.STRIPE_PUBLISHABLE_KEY ||
-  !process.env.ARBOR_DAY_FOUNDATION ||
-  !process.env.RAIN_FOREST_TRUST ||
-  !process.env.STATIC_DIR
-) {
-  console.log(
-    'The .env file is not configured. Follow the instructions in the readme to configure the .env file. https://github.com/stripe-samples/subscription-use-cases'
-  );
-  console.log('');
-  process.env.STRIPE_SECRET_KEY
-    ? ''
-    : console.log('Add STRIPE_SECRET_KEY to your .env file.');
+// if (
+//   !STRIPE_SECRET_KEY ||
+//   !STRIPE_PUBLISHABLE_KEY ||
+//   !ARBOR_DAY_FOUNDATION ||
+//   !RAIN_FOREST_TRUST ||
+//   !STATIC_DIR
+// ) {
+//   console.log(
+//     'The .env file is not configured. Follow the instructions in the readme to configure the .env file. https://github.com/stripe-samples/subscription-use-cases'
+//   );
+//   console.log('');
+//   STRIPE_SECRET_KEY
+//     ? ''
+//     : console.log('Add STRIPE_SECRET_KEY to your .env file.');
 
-  process.env.STRIPE_PUBLISHABLE_KEY
-    ? ''
-    : console.log('Add STRIPE_PUBLISHABLE_KEY to your .env file.');
+//   STRIPE_PUBLISHABLE_KEY
+//     ? ''
+//     : console.log('Add STRIPE_PUBLISHABLE_KEY to your .env file.');
 
-  process.env.ARBOR_DAY_FOUNDATION
-    ? ''
-    : console.log(
-        'Add ARBOR_DAY_FOUNDATION priceID to your .env file. See repo readme for setup instructions.'
-      );
+//   ARBOR_DAY_FOUNDATION
+//     ? ''
+//     : console.log(
+//         'Add ARBOR_DAY_FOUNDATION priceID to your .env file. See repo readme for setup instructions.'
+//       );
 
-  process.env.RAIN_FOREST_TRUST
-    ? ''
-    : console.log(
-        'Add RAIN_FOREST_TRUST priceID to your .env file. See repo readme for setup instructions.'
-      );
+//   RAIN_FOREST_TRUST
+//     ? ''
+//     : console.log(
+//         'Add RAIN_FOREST_TRUST priceID to your .env file. See repo readme for setup instructions.'
+//       );
 
-  process.env.STATIC_DIR
-    ? ''
-    : console.log(
-        'Add STATIC_DIR to your .env file. Check .env.example in the root folder for an example'
-      );
+//   STATIC_DIR
+//     ? ''
+//     : console.log(
+//         'Add STATIC_DIR to your .env file. Check .env.example in the root folder for an example'
+//       );
 
-  process.exit();
-}
+//   process.exit();
+// }
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
+const stripe = require('stripe')(STRIPE_SECRET_KEY, {
   apiVersion: '2020-08-27',
   appInfo: { // For sample support and debugging, not required for production:
     name: "stripe-samples/subscription-use-cases/usage-based-subscriptions",
@@ -55,7 +61,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
 });
 
 
-app.use(express.static(process.env.STATIC_DIR));
+app.use(express.static(STATIC_DIR));
 // Use JSON parser for all non-webhook routes.
 app.use((req, res, next) => {
   if (req.originalUrl === '/webhook') {
@@ -66,13 +72,13 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-  const path = resolve(process.env.STATIC_DIR + '/index.html');
+  const path = resolve(STATIC_DIR + '/index.html');
   res.sendFile(path);
 });
 
 app.get('/config', async (req, res) => {
   res.send({
-    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+    publishableKey: STRIPE_PUBLISHABLE_KEY,
   });
 });
 
@@ -103,10 +109,10 @@ app.get('/search-customer', async (req, res) => {
 app.get('/get-priceId', async (req, res) => {
   let priceId=req.query.priceId;
   // Create a new customer object
-  if (process.env.ARBOR_DAY_FOUNDATION == priceId){
+  if (ARBOR_DAY_FOUNDATION == priceId){
     priceId = "Arbor Day Foundation"
   }
-  else if (process.env.RAIN_FOREST_TRUST == priceId){
+  else if (RAIN_FOREST_TRUST == priceId){
     priceId = "Rainforest Trust"
 
   }
@@ -285,7 +291,7 @@ app.post(
       event = stripe.webhooks.constructEvent(
         req.body,
         req.headers['stripe-signature'],
-        process.env.STRIPE_WEBHOOK_SECRET
+        STRIPE_WEBHOOK_SECRET
       );
     } catch (err) {
       console.log(err);
