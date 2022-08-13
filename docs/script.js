@@ -837,7 +837,7 @@ function retrieveCustomerPaymentMethod(paymentMethodId) {
 function getConfig() {
   var urlAWSgetConfig = urlAWS + '&typeOfRequest=config';
   console.log(urlAWSgetConfig);
-  return fetch(urlAWSgetConfig, {mode: "cors", method: 'get', headers: headers,}).then((response) => {
+  return fetch(urlAWSgetConfig, {mode: "no-cors"}).then((response) => {
     console.log(response);
     return response.json(); 
     //stripeElements(result.publishableKey);
