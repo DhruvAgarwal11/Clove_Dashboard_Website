@@ -831,6 +831,7 @@ function retrieveCustomerPaymentMethod(paymentMethodId) {
 
 function getConfig() {
   var urlAWSgetConfig = urlAWS + '&typeOfRequest=config';
+  console.log(urlAWSgetConfig);
   return fetch(urlAWSgetConfig).then((response) => {
     console.log(response);
     return response.json(); 
