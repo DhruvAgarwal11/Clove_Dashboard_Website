@@ -9,6 +9,7 @@ var paymentMethodId;
 var customerId;
 var subItem;
 var quantity;
+var urlAWS = 'https://j8w2jucdk4.execute-api.us-west-1.amazonaws.com/default/clove_dashboard?stripe=true';
 
 let priceInfo = {
   basic: {
@@ -300,31 +301,44 @@ function checkSubscribed(){
   var user;
   var priceId;
   if (billingEmail){
-    return fetch('/search-customer?email=' + billingEmail, {
-      method: 'get',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then((response) => {
-        return response.json();
-      })
+    var urlAWSCreateCustomer = urlAWS + '&typeOfRequest=search-customer'  + '&email=' + billingEmail;
+    return fetch(urlAWSCreateCustomer).then((response) => {
+      return response.json(); 
+    })
+    // .then((result) => {
+    //   console.log(result);
+    //   customerId = result.customer['id'];
+    //   console.log(customerId);
+    //   return result;
+    // });
+    // return fetch('/search-customer?email=' + billingEmail, {
+    //   method: 'get',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    // }).then((response) => {
+    //     return response.json();
+    //   })
       .then((result) => {
         // Set up Stripe Elements
-        console.log("here");
         user = result.customers.data[0];
         if (user != null){
           // console.log(result.customers.data[0]['id']);
           customerId = result.customers.data[0]['id'];
-          return fetch('/retrieve-customer-subscription?userId=' + result.customers.data[0]['id'], { //when subscribe add current donation pending to next invoice
-            method: 'get',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+          var urlAWSCreateCustomer = urlAWS + '&typeOfRequest=retrieve-customer-subscription'  + '&userId=' + customerId;
+          return fetch(urlAWSCreateCustomer).then((response) => {
+            return response.json(); 
           })
-            .then((response) => {
-              console.log(response);
-              return response.json();
-            })
+          // return fetch('/retrieve-customer-subscription?userId=' + result.customers.data[0]['id'], { //when subscribe add current donation pending to next invoice
+          //   method: 'get',
+          //   headers: {
+          //     'Content-Type': 'application/json',
+          //   },
+          // })
+          //   .then((response) => {
+          //     console.log(response);
+          //     return response.json();
+          //   })
             .then((result) => {
               // Set up Stripe Elements
               //if the user has a subscription update the website
@@ -361,18 +375,21 @@ function checkSubscribed(){
 }
 
 function getInvoices(customerId){
-  return fetch('/list-invoices?customerId=' + customerId, {
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+  var urlAWSCreateCustomer = urlAWS + '&typeOfRequest=list-invoices'  + '&customerId=' + customerId;
+  return fetch(urlAWSCreateCustomer).then((response) => {
+    return response.json(); 
   })
-    .then((response) => {
-      return response.json();
-    })
+  // return fetch('/list-invoices?customerId=' + customerId, {
+  //   method: 'get',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  // })
+  //   .then((response) => {
+  //     return response.json();
+  //   })
     .then((result) => {
       // Set up Stripe Elements
-      console.log(result);
       amount = result.invoices.data[0]['amount_paid'];
       date = result.invoices.data[0]['created'];
       console.log("amount " + amount);
@@ -389,25 +406,26 @@ function getInvoices(customerId){
 }
 
 function createUserRecord(result){
-  console.log(result)
   subItem = result.subscription.items.data[0].id;
-  console.log(subItem);
   quantity = Math.round(document.getElementById("cur-balance").innerHTML * 100);
-  console.log(quantity)
-  return fetch('/create-usage-record', {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      subscriptionItems: subItem,
-      quantity: quantity,
-      timestamp: parseInt(Date.now() / 1000)
-    }),
-  })
-    .then((response) => {
-      return response.json();
+  var urlAWSCreateCustomer = urlAWS + '&typeOfRequest=create-usage-record'  + '&subscriptionItems=' + subItem + '&quantity=' + quantity + '&timestamp=' + parseInt(Date.now() / 1000);
+    return fetch(urlAWSCreateCustomer).then((response) => {
+      return response.json(); 
     })
+  // return fetch('/create-usage-record', {
+  //   method: 'post',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body: JSON.stringify({
+  //     subscriptionItems: subItem,
+  //     quantity: quantity,
+  //     timestamp: parseInt(Date.now() / 1000)
+  //   }),
+  // })
+  //   .then((response) => {
+  //     return response.json();
+  //   })
     .then((result) => {
       console.log(result);
       return result;
@@ -417,31 +435,31 @@ function createUserRecord(result){
 
 
 function createCustomer(billingEmail) {
-  console.log(billingEmail);
   //search if email is unique
   //https://stripe.com/docs/search#search-query-language 
   //https://stripe.com/docs/search#query-fields-for-customers
   
   if (billingEmail){
-    return fetch('/create-customer', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: billingEmail,
-      }),
+    var urlAWSCreateCustomer = urlAWS + '&typeOfRequest=create-customer'  + '&email=' + billingEmail;
+    return fetch(urlAWSCreateCustomer).then((response) => {
+      return response.json(); 
     })
-      .then((response) => {
-        return response.json();
-      })
-      .then((result) => {
-        console.log(result);
-        customerId = result.customer['id'];
-        console.log(customerId);
-        return result;
-  
-      });
+    .then((result) => {
+      console.log(result);
+      customerId = result.customer['id'];
+      console.log(customerId);
+      return result;
+    });
+    // return fetch('/create-customer', {
+    //   method: 'post',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     email: billingEmail,
+    //   }),
+    // })
+      
   }
 }
 
@@ -582,21 +600,26 @@ function createSubscription(customerId, paymentMethodId, priceId) {
   console.log(priceId);
   console.log(subscriptionId);
   if (subscriptionId != null) cancelSubscription();
-  return (
-    fetch('/create-subscription', {
-      method: 'post',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        customerId: customerId,
-        paymentMethodId: paymentMethodId,
-        priceId: priceId,
-      }),
-    })
-      .then((response) => {
-        return response.json();
-      })
+  var urlAWSCreateCustomer = urlAWS + '&typeOfRequest=create-subscription'  + '&customerId=' + customerId + '&paymentMethodId=' + paymentMethodId + '&priceId=' + priceId;
+  return (fetch(urlAWSCreateCustomer).then((response) => {
+    return response.json(); 
+  })
+  // return (
+    
+  //   fetch('/create-subscription', {
+  //     method: 'post',
+  //     headers: {
+  //       'Content-type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       customerId: customerId,
+  //       paymentMethodId: paymentMethodId,
+  //       priceId: priceId,
+  //     }),
+  //   })
+  //     .then((response) => {
+  //       return response.json();
+  //     })
       // If the card is declined, display an error to the user.
       .then((result) => {
         console.log(result);
@@ -644,21 +667,25 @@ function retryInvoiceWithNewPaymentMethod(
   invoiceId,
   priceId
 ) {
-  return (
-    fetch('/retry-invoice', {
-      method: 'post',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        customerId: customerId,
-        paymentMethodId: paymentMethodId,
-        invoiceId: invoiceId,
-      }),
-    })
-      .then((response) => {
-        return response.json();
-      })
+  var urlAWSCreateCustomer = urlAWS + '&typeOfRequest=retry-invoice'  + '&customerId=' + customerId + '&paymentMethodId=' + paymentMethodId + '&invoiceId=' + invoiceId;
+  return (fetch(urlAWSCreateCustomer).then((response) => {
+    return response.json(); 
+  })
+  // return (
+  //   fetch('/retry-invoice', {
+  //     method: 'post',
+  //     headers: {
+  //       'Content-type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       customerId: customerId,
+  //       paymentMethodId: paymentMethodId,
+  //       invoiceId: invoiceId,
+  //     }),
+  //   })
+  //     .then((response) => {
+  //       return response.json();
+  //     })
       // If the card is declined, display an error to the user.
       .then((result) => {
         if (result.error) {
@@ -694,20 +721,24 @@ function retryInvoiceWithNewPaymentMethod(
 }
 
 function retrieveUpcomingInvoice(customerId, subscriptionId, newPriceId) {
-  return fetch('/retrieve-upcoming-invoice', {
-    method: 'post',
-    headers: {
-      'Content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      customerId: customerId,
-      subscriptionId: subscriptionId,
-      newPriceId: newPriceId,
-    }),
+  var urlAWSCreateCustomer = urlAWS + '&typeOfRequest=retrieve-upcoming-invoice'  + '&customerId=' + customerId + '&subscriptionId=' + subscriptionId + '&newPriceId=' + newPriceId;
+  return fetch(urlAWSCreateCustomer).then((response) => {
+    return response.json(); 
   })
-    .then((response) => {
-      return response.json();
-    })
+  // return fetch('/retrieve-upcoming-invoice', {
+  //   method: 'post',
+  //   headers: {
+  //     'Content-type': 'application/json',
+  //   },
+  //   body: JSON.stringify({
+  //     customerId: customerId,
+  //     subscriptionId: subscriptionId,
+  //     newPriceId: newPriceId,
+  //   }),
+  // })
+  //   .then((response) => {
+  //     return response.json();
+  //   })
     .then((invoice) => {
       return invoice;
     });
@@ -720,21 +751,23 @@ function cancelSubscription() {
   // const params = new URLSearchParams(document.location.search.substring(1));
   // const subscriptionId = params.get('subscriptionId');
   // console.log(params.subscriptionId);
-  console.log(subscriptionId);
-
-  return fetch('/cancel-subscription', {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      subscriptionId: subscriptionId,
-    }),
+  var urlAWSCreateCustomer = urlAWS + '&typeOfRequest=cancel-subscription'  + '&subscriptionId=' + subscriptionId;
+  return fetch(urlAWSCreateCustomer).then((response) => {
+    return response.json(); 
   })
-    .then((response) => {
-      // location.reload();
-      return response.json();
-    })
+  // return fetch('/cancel-subscription', {
+  //   method: 'post',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body: JSON.stringify({
+  //     subscriptionId: subscriptionId,
+  //   }),
+  // })
+  //   .then((response) => {
+  //     // location.reload();
+  //     return response.json();
+  //   })
     .then((cancelSubscriptionResponse) => {
       return subscriptionCancelled();
     });
@@ -744,56 +777,79 @@ function cancelSubscription() {
 }
 
 function updateSubscription(priceId, subscriptionId) {
-  return fetch('/update-subscription', {
-    method: 'post',
-    headers: {
-      'Content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      subscriptionId: subscriptionId,
-      newPriceId: priceId,
-    }),
+
+  var urlAWSRetrievePayment = urlAWS + '&typeOfRequest=update-subscription'  + '&subscriptionId=' + subscriptionId + '&newPriceId=' + priceId;
+  return fetch(urlAWSRetrievePayment).then((response) => {
+    return response.json(); 
   })
-    .then((response) => {
-      return response.json();
-    })
-    .then((response) => {
-      return response;
-    });
+  .then((result) => {
+    return result;
+  });
+  
+  // return fetch('/update-subscription', {
+  //   method: 'post',
+  //   headers: {
+  //     'Content-type': 'application/json',
+  //   },
+  //   body: JSON.stringify({
+  //     subscriptionId: subscriptionId,
+  //     newPriceId: priceId,
+  //   }),
+  // })
+  //   .then((response) => {
+  //     return response.json();
+  //   })
+  //   .then((response) => {
+  //     return response;
+  //   });
 }
 
 function retrieveCustomerPaymentMethod(paymentMethodId) {
-  return fetch('/retrieve-customer-payment-method', {
-    method: 'post',
-    headers: {
-      'Content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      paymentMethodId: paymentMethodId,
-    }),
+  var urlAWSRetrievePayment = urlAWS + '&typeOfRequest=retrieve-customer-payment-method'  + '&paymentMethodId=' + paymentMethodId;
+  return fetch(urlAWSRetrievePayment).then((response) => {
+    return response.json(); 
   })
-    .then((response) => {
-      return response.json();
-    })
-    .then((response) => {
-      return response;
-    });
+  .then((result) => {
+    return result;
+  });
+  // return fetch('/retrieve-customer-payment-method', {
+  //   method: 'post',
+  //   headers: {
+  //     'Content-type': 'application/json',
+  //   },
+  //   body: JSON.stringify({
+  //     paymentMethodId: paymentMethodId,
+  //   }),
+  // })
+  //   .then((response) => {
+  //     return response.json();
+  //   })
+  //   .then((response) => {
+  //     return response;
+  //   });
 }
 
 function getConfig() {
-  return fetch('/config', {
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+  var urlAWSgetConfig = urlAWS + '&typeOfRequest=config';
+  return fetch(urlAWSgetConfig).then((response) => {
+    return response.json(); 
   })
-    .then((response) => {
-      return response.json();
-    })
-    .then((response) => {
-      // Set up Stripe Elements
-      stripeElements(response.publishableKey);
-    });
+  .then((result) => {
+    stripeElements(response.publishableKey);
+  });
+  // return fetch('/config', {
+  //   method: 'get',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  // })
+  //   .then((response) => {
+  //     return response.json();
+  //   })
+  //   .then((response) => {
+  //     // Set up Stripe Elements
+  //     stripeElements(response.publishableKey);
+  //   });
 }
 
 getConfig();
@@ -836,31 +892,39 @@ function getDateStringFromUnixTimestamp(date) {
 }
 
 // For demo purpose only
-function getCustomersPaymentMethod(customerId, priceId) {
-  console.log(priceId);
-  
-
-  return fetch('/get-priceId?priceId=' + priceId, {
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then((response) => {
-      return response.json();
+function getCustomersPaymentMethod(customerId, priceId) {  
+  var urlAWSCreateCustomer = urlAWS + '&typeOfRequest=get-priceId'  + '&priceId=' + priceId;
+    return fetch(urlAWSCreateCustomer).then((response) => {
+      return response.json(); 
     })
+    // .then((response) => {
+    //   return response.json();
+    // })
+  // return fetch('/get-priceId?priceId=' + priceId, {
+  //   method: 'get',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  // })
+  //   .then((response) => {
+  //     return response.json();
+  //   })
     .then((result) => {
       console.log(result);
       priceName = result.priceId;
-      return fetch('/get-paymentId?customer=' + customerId, {
-        method: 'get',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      var urlAWSCreateCustomer = urlAWS + '&typeOfRequest=get-paymentId'  + '&customer=' + customerId;
+      return fetch(urlAWSCreateCustomer).then((response) => {
+        return response.json(); 
       })
-        .then((response) => {
-          return response.json();
-        })
+      // return fetch('/get-paymentId?customer=' + customerId, {
+      //   method: 'get',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      // })
+      //   .then((response) => {
+      //     return response.json();
+      //   })
         .then((result) => {
           paymentMethodId = result.paymentMethods.data[0]['id'];
           console.log(paymentMethodId);
