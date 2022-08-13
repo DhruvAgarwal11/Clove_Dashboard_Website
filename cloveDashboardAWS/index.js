@@ -18,16 +18,25 @@ exports.handler = async function(event, context, callback){
   }
   
   if (typeOfRequest == "config"){
-    return STRIPE_PUBLISHABLE_KEY;
+    const response = {
+      statusCode: 200,
+      body: JSON.stringify(STRIPE_PUBLISHABLE_KEY)
+    };
+    return response;
+    // return  {
+    //   statusCode: 200,
+    //   body: {publishableKey: STRIPE_PUBLISHABLE_KEY}
+    // };
   }
   else if (typeOfRequest == "create-customer"){
     const customer = await stripe.customers.create({
       email: event.queryStringParameters.email,
     });
-    return  {
+    const response = {
       statusCode: 200,
-      body: {customer}
+      body: JSON.stringify(customer)
     };
+    return response;
   }
   else if (typeOfRequest == "search-customer"){
     const customers = await stripe.customers.list({
@@ -35,10 +44,11 @@ exports.handler = async function(event, context, callback){
       email:event.queryStringParameters.email
     });
     var ret = customers.data[0];
-    return {
+    const response = {
       statusCode: 200,
-      body: {ret}
+      body: JSON.stringify(ret)
     };
+    return response;
   }
   else if (typeOfRequest == "get-priceId"){
     const priceId=event.queryStringParameters.priceId;
@@ -48,48 +58,53 @@ exports.handler = async function(event, context, callback){
     else if (RAIN_FOREST_TRUST == priceId){
       priceId = "Rainforest Trust"
     }
-    return {
+    const response = {
       statusCode: 200,
-      body: {priceId}
+      body: JSON.stringify(priceId)
     };
+    return response;
   }
   else if (typeOfRequest == "get-paymentId"){
     const paymentMethods = await stripe.customers.listPaymentMethods(
       event.queryStringParameters.customerId,
       {type: 'card'}
     );
-    return  {
+    const response = {
       statusCode: 200,
-      body: {paymentMethods}
+      body: JSON.stringify(paymentMethods)
     };
+    return response;
   }
   else if (typeOfRequest == "create-usage-record"){
     const usageRecord = await stripe.subscriptionItems.createUsageRecord(
       event.queryStringParameters.subscriptionItems,
       {quantity: event.queryStringParameters.quantity, timestamp: event.queryStringParameters.timestamp}
     );
-    return  {
+    const response = {
       statusCode: 200,
-      body: {usageRecord}
+      body: JSON.stringify(usageRecord)
     };
+    return response;
   }
   else if (typeOfRequest == "retrieve-customer-subscription"){
     const subscriptions = await stripe.subscriptions.list({
       customer: event.queryStringParameters.userId
     });
-    return  {
+    const response = {
       statusCode: 200,
-      body: {subscriptions}
+      body: JSON.stringify(subscriptions)
     };
+    return response;
   }
   else if (typeOfRequest == "list-invoices"){
     const invoices = await stripe.invoices.list({
       customer: event.queryStringParameters.customerId,
     });
-    return  {
+    const response = {
       statusCode: 200,
-      body: {invoices}
+      body: JSON.stringify(invoices)
     };
+    return response;
   }
   else if (typeOfRequest == "create-subscription"){
     try {
@@ -98,10 +113,11 @@ exports.handler = async function(event, context, callback){
       });
     } catch (error) {
       var msg = error.message;
-      return  {
+      const response = {
         statusCode: 200,
-        body: {msg}
+        body: JSON.stringify(msg)
       };
+      return response;
     }
     let updateCustomerDefaultPaymentMethod = await stripe.customers.update(
       event.queryStringParameters.customerId,
@@ -117,10 +133,11 @@ exports.handler = async function(event, context, callback){
       items: [{ price: (event.queryStringParameters.priceId == "ARBOR_DAY_FOUNDATION")?ARBOR_DAY_FOUNDATION:RAIN_FOREST_TRUST}],
       expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
     }); 
-    return  {
+    const response = {
       statusCode: 200,
-      body: {subscription}
+      body: JSON.stringify(subscription)
     };
+    return response;
   }
   else if (typeOfRequest == "retry-invoice"){
     try {
@@ -135,18 +152,20 @@ exports.handler = async function(event, context, callback){
     } catch (error) {
       // in case card_decline error
       var msg = error.message;
-      return  {
+      const response = {
         statusCode: 200,
-        body: {msg}
+        body: JSON.stringify(msg)
       };
+      return response;
     }
     const invoice = await stripe.invoices.retrieve(event.queryStringParameters.invoiceId, {
       expand: ['payment_intent'],
     });
-    return  {
+    const response = {
       statusCode: 200,
-      body: {invoice}
+      body: JSON.stringify(invoice)
     };
+    return response;
   }
   else if (typeOfRequest == "retrieve-upcoming-invoice"){
     const subscription = await stripe.subscriptions.retrieve(
@@ -169,19 +188,21 @@ exports.handler = async function(event, context, callback){
         },
       ],
     });
-    return  {
+    const response = {
       statusCode: 200,
-      body: {invoice}
+      body: JSON.stringify(invoice)
     };
+    return response;
   }
   else if (typeOfRequest == "cancel-subscription"){
     const deletedSubscription = await stripe.subscriptions.del(
       event.queryStringParameters.subscriptionId
     );
-    return  {
+    const response = {
       statusCode: 200,
-      body: {deletedSubscription}
+      body: JSON.stringify(deletedSubscription)
     };
+    return response;
   }
   else if (typeOfRequest == "update-subscription"){
     const subscription = await stripe.subscriptions.retrieve(
@@ -199,19 +220,21 @@ exports.handler = async function(event, context, callback){
         ],
       }
     );
-    return  {
+    const response = {
       statusCode: 200,
-      body: {updatedSubscription}
+      body: JSON.stringify(updatedSubscription)
     };
+    return response;
   }
   else if (typeOfRequest == "retrieve-customer-payment-method"){
     const paymentMethod = await stripe.paymentMethods.retrieve(
       event.queryStringParameters.paymentMethodId
     );
-    return  {
+    const response = {
       statusCode: 200,
-      body: {paymentMethod}
+      body: JSON.stringify(paymentMethod)
     };
+    return response;
   }
   const response = {
     statusCode: 200,

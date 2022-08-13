@@ -832,11 +832,13 @@ function retrieveCustomerPaymentMethod(paymentMethodId) {
 function getConfig() {
   var urlAWSgetConfig = urlAWS + '&typeOfRequest=config';
   return fetch(urlAWSgetConfig).then((response) => {
+    console.log(response);
     return response.json(); 
+    //stripeElements(result.publishableKey);
+
   })
-  .then((result) => {
-    stripeElements(response.publishableKey);
-  });
+  // .then((result) => {
+  // });
   // return fetch('/config', {
   //   method: 'get',
   //   headers: {
