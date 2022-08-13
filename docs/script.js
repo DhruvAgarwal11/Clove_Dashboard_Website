@@ -302,7 +302,9 @@ function checkSubscribed(){
   var priceId;
   if (billingEmail){
     var urlAWSCreateCustomer = urlAWS + '&typeOfRequest=search-customer'  + '&email=' + billingEmail;
-    return fetch(urlAWSCreateCustomer).then((response) => {
+    return fetch(urlAWSCreateCustomer, {headers: {
+      'Content-Type': 'application/json',
+    },}).then((response) => {
       return response.json(); 
     })
     // .then((result) => {
@@ -313,9 +315,7 @@ function checkSubscribed(){
     // });
     // return fetch('/search-customer?email=' + billingEmail, {
     //   method: 'get',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
+      
     // }).then((response) => {
     //     return response.json();
     //   })
@@ -832,7 +832,9 @@ function retrieveCustomerPaymentMethod(paymentMethodId) {
 function getConfig() {
   var urlAWSgetConfig = urlAWS + '&typeOfRequest=config';
   console.log(urlAWSgetConfig);
-  return fetch(urlAWSgetConfig).then((response) => {
+  return fetch(urlAWSgetConfig, {headers: {
+    'Content-Type': 'application/json',
+  },}).then((response) => {
     console.log(response);
     return response.json(); 
     //stripeElements(result.publishableKey);
