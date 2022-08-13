@@ -5,8 +5,8 @@ let headers = new Headers();
 
 headers.append('Content-Type', 'application/json');
 // headers.append('Accept', 'application/json');
-headers.append('Origin','http://dashboard.joinclove.org');
-headers.append("Access-Control-Allow-Origin", "https://j8w2jucdk4.execute-api.us-west-1.amazonaws.com")
+// headers.append('Origin','http://dashboard.joinclove.org');
+headers.append("Access-Control-Allow-Origin", "*")
 var billingEmail;
 var priceName;
 var amount;
