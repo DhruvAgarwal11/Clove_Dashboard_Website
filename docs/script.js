@@ -4,8 +4,9 @@ let stripe, customer, price, card, subscriptionId;
 let headers = new Headers();
 
 headers.append('Content-Type', 'application/json');
-headers.append('Accept', 'application/json');
+// headers.append('Accept', 'application/json');
 headers.append('Origin','http://dashboard.joinclove.org');
+headers.append("Access-Control-Allow-Origin", "https://j8w2jucdk4.execute-api.us-west-1.amazonaws.com")
 var billingEmail;
 var priceName;
 var amount;
@@ -14,7 +15,7 @@ var paymentMethodId;
 var customerId;
 var subItem;
 var quantity;
-var urlAWS = 'https://morning-beyond-26570.herokuapp.com/https://j8w2jucdk4.execute-api.us-west-1.amazonaws.com/default/clove_dashboard?stripe=true';
+var urlAWS = 'https://j8w2jucdk4.execute-api.us-west-1.amazonaws.com/default/clove_dashboard?stripe=true';
 
 let priceInfo = {
   basic: {
@@ -837,10 +838,7 @@ function retrieveCustomerPaymentMethod(paymentMethodId) {
 function getConfig() {
   var urlAWSgetConfig = urlAWS + '&typeOfRequest=config';
   console.log(urlAWSgetConfig);
-  return fetch(urlAWSgetConfig, { headers: {
-    'Content-Type': 'application/json'
-    // 'Content-Type': 'application/x-www-form-urlencoded',
-  },}).then((response) => {
+  return fetch(urlAWSgetConfig, {mode: "cors", headers: headers}).then((response) => {
     console.log(response);
     return response.json(); 
     //stripeElements(result.publishableKey);
