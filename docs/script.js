@@ -150,7 +150,6 @@ function createPaymentMethod({ card, isPaymentRetry, invoiceId }) {
   }
   else if (priceId == "Rainforest Trust"){
     priceId = "RAIN_FOREST_TRUST";
-    console.log("here");
   }
 
   stripe
@@ -312,6 +311,9 @@ function checkSubscribed(){
   if (billingEmail){
     var urlAWSSearchCustomer = urlAWS + '&typeOfRequest=search-customer'  + '&email=' + billingEmail;
     return fetch(urlAWSSearchCustomer, {method: "get",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
+      // var theResponse = response;
+      // console.log(theResponse);
+      // console.log(theResponse.json());
       return response.json(); 
     })
     // .then((result) => {
@@ -328,10 +330,13 @@ function checkSubscribed(){
     //   })
       .then((result) => {
         // Set up Stripe Elements
-        user = result;
-        if (user != null){
+        // conso
+        console.log(result);
+        // user = result.data[0];
+        if (result.data.length > 0){
           // console.log(result.customers.data[0]['id']);
-          customerId = result['id'];
+          user = result.data[0];
+          customerId = result.data[0]['id'];
           console.log(customerId);
           var urlAWSRetrieveCustomerSubscription = urlAWS + '&typeOfRequest=retrieve-customer-subscription'  + '&userId=' + customerId;
           return fetch(urlAWSRetrieveCustomerSubscription, {method: "get",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
@@ -351,7 +356,27 @@ function checkSubscribed(){
               console.log(result);
               // Set up Stripe Elements
               //if the user has a subscription update the website
-              if (result.data.length > 0){
+              if (result.data.length > 1){
+                var urlAWSCancelSubscription = urlAWS + '&typeOfRequest=cancel-subscription'  + '&subscriptionId=' + result.data[1].id;
+                  return fetch(urlAWSCancelSubscription, {method: "post",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
+                    priceId = result.data[0].items.data[0].price['id'];
+                    console.log(priceId);
+                    subscriptionId = result.data[0].id;
+                    console.log(subscriptionId);
+                    //editing the donation button and sidebar
+                    document.querySelector('#DonateButton').classList.remove('btn');
+                    document.querySelector('#DonateButton').classList.add('hidden');
+                    document.querySelector('#SubscriptionSettings').classList.remove('hidden');
+                    document.querySelector('#SubscriptionSettings').classList.add('btn');
+                    document.querySelector('#SubscriptionSettings').classList.add('btn-primary');
+                    //find the details for the user subscription
+                    getCustomersPaymentMethod(customerId, priceId);
+                    // return user;
+                    getInvoices(customerId);
+                    return response.json(); 
+                  })
+              }
+              else if (result.data.length > 0){
                 priceId = result.data[0].items.data[0].price['id'];
                 console.log(priceId);
                 subscriptionId = result.data[0].id;
@@ -416,9 +441,12 @@ function getInvoices(customerId){
 }
 
 function createUserRecord(result){
+  console.log(result);
   subItem = result.subscription.items.data[0].id;
+  console.log(subItem);
   quantity = Math.round(document.getElementById("cur-balance").innerHTML * 100);
-  var urlAWSCreateUsageRecord = urlAWS + '&typeOfRequest=create-usage-record'  + '&subscriptionItems=' + subItem + '&quantity=' + quantity + '&timestamp=' + parseInt(Date.now() / 1000);
+  console.log(quantity);
+  var urlAWSCreateUsageRecord = urlAWS + '&typeOfRequest=create-usage-record'  + '&subscriptionItems=' + subItem + '&newQuantity=' + quantity + '&timestamp=' + parseInt(Date.now() / 1000);
     return fetch(urlAWSCreateUsageRecord, {method: "post",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
       return response.json(); 
     })
@@ -455,7 +483,8 @@ function createCustomer(billingEmail) {
       return response.json(); 
     })
     .then((result) => {
-      customerId = result.customer['id'];
+      customerId = result['id'];
+      console.log(customerId);
       return result;
     });
     // return fetch('/create-customer', {
@@ -609,7 +638,7 @@ function createSubscription(customerId, paymentMethodId, priceId) {
   console.log(subscriptionId);
   if (subscriptionId != null) cancelSubscription();
   var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription'  + '&customerId=' + customerId + '&paymentMethodId=' + paymentMethodId + '&priceId=' + priceId;
-  return (fetch(urlAWSCreateSubscription, {method: "post",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
+  return fetch(urlAWSCreateSubscription, {method: "post",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
     return response.json(); 
   })
   // return (
@@ -665,8 +694,7 @@ function createSubscription(customerId, paymentMethodId, priceId) {
         // An error has happened. Display the failure to the user here.
         // We utilize the HTML element we created.
         displayError(error);
-      })
-  );
+      });
 }
 
 function retryInvoiceWithNewPaymentMethod(
@@ -760,9 +788,10 @@ function cancelSubscription() {
   // const subscriptionId = params.get('subscriptionId');
   // console.log(params.subscriptionId);
   var urlAWSCancelSubscription = urlAWS + '&typeOfRequest=cancel-subscription'  + '&subscriptionId=' + subscriptionId;
-  return fetch(urlAWSCancelSubscription, {method: "post",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
-    return response.json(); 
-  })
+    return fetch(urlAWSCancelSubscription, {method: "post",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
+      return subscriptionCancelled();
+    });
+    return subscriptionCancelled();
   // return fetch('/cancel-subscription', {
   //   method: 'post',
   //   headers: {
@@ -776,9 +805,10 @@ function cancelSubscription() {
   //     // location.reload();
   //     return response.json();
   //   })
-    .then((cancelSubscriptionResponse) => {
-      return subscriptionCancelled();
-    });
+    // .then((cancelSubscriptionResponse) => {
+      
+    // });
+    
     // .then((response) => {
     //   return response;
     // });
@@ -844,13 +874,13 @@ function getConfig() {
 // headers.append("Access-Control-Allow-Origin", "*");
 // headers.append("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS");
   return fetch(urlAWSgetConfig, {method: "get",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
-    // console.log(response.json());
     return response.json(); 
     //stripeElements(result.publishableKey);
   })
   .then((result) => {
-    console.log("here");
-    console.log(result);
+    // console.log("here");
+    // console.log(result);
+    stripeElements(result);
   });
   // return fetch('/config', {
   //   method: 'get',
