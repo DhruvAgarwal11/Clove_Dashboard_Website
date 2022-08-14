@@ -1,4 +1,6 @@
 import { updatePaid } from './js/receiveData.js';
+import fetch from 'node-fetch';
+
 
 let stripe, customer, price, card, subscriptionId;
 let headers = new Headers();
@@ -7,6 +9,10 @@ headers.append('Content-Type', 'application/json');
 // headers.append('Accept', 'application/json');
 // headers.append('Origin','http://dashboard.joinclove.org');
 headers.append("Access-Control-Allow-Origin", "*")
+headers.append("Access-Control-Allow-Headers", "Content-Type");
+headers.append("Access-Control-Allow-Origin", "https://dashboard.joinclove.org");
+headers.append("Access-Control-Allow-Methods", "OPTIONS,POST,GET");
+
 var billingEmail;
 var priceName;
 var amount;
