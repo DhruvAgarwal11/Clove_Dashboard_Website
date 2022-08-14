@@ -448,6 +448,7 @@ function createUserRecord(result){
   console.log(quantity);
   var urlAWSCreateUsageRecord = urlAWS + '&typeOfRequest=create-usage-record'  + '&subscriptionItems=' + subItem + '&newQuantity=' + quantity + '&timestamp=' + parseInt(Date.now() / 1000);
     return fetch(urlAWSCreateUsageRecord, {method: "post",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
+      console.log(response);
       return response.json(); 
     })
   // return fetch('/create-usage-record', {
@@ -464,9 +465,9 @@ function createUserRecord(result){
   //   .then((response) => {
   //     return response.json();
   //   })
-    .then((result) => {
-      console.log(result);
-      return result;
+    .then((result2) => {
+      console.log(result2);
+      return result2;
 
     });
 }
