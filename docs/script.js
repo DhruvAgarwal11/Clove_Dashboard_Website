@@ -1,5 +1,5 @@
 import { updatePaid } from './js/receiveData.js';
-import fetch from 'node-fetch';
+// import fetch from 'node-fetch';
 
 
 let stripe, customer, price, card, subscriptionId;
@@ -21,7 +21,7 @@ var paymentMethodId;
 var customerId;
 var subItem;
 var quantity;
-var urlAWS = 'https://j8w2jucdk4.execute-api.us-west-1.amazonaws.com/default/clove_dashboard?stripe=true';
+var urlAWS = 'https://j8w2jucdk4.execute-api.us-west-1.amazonaws.com/deploying/clove_dashboard?stripe=true';
 
 let priceInfo = {
   basic: {
