@@ -8,7 +8,7 @@ let headers = new Headers();
 headers.append('Content-Type', 'application/json');
 // headers.append('Accept', 'application/json');
 // headers.append('Origin','http://dashboard.joinclove.org');
-headers.append("Access-Control-Allow-Origin", "*")
+// headers.append("Access-Control-Allow-Origin", "*")
 headers.append("Access-Control-Allow-Headers", "Content-Type");
 headers.append("Access-Control-Allow-Origin", "https://dashboard.joinclove.org");
 headers.append("Access-Control-Allow-Methods", "OPTIONS,POST,GET");
@@ -844,7 +844,7 @@ function retrieveCustomerPaymentMethod(paymentMethodId) {
 function getConfig() {
   var urlAWSgetConfig = urlAWS + '&typeOfRequest=config';
   console.log(urlAWSgetConfig);
-  return fetch(urlAWSgetConfig, {mode: "cors", headers: headers}).then((response) => {
+  return fetch(urlAWSgetConfig, {mode: "cors", method: "get",  headers: headers}).then((response) => {
     console.log(response);
     return response.json(); 
     //stripeElements(result.publishableKey);
