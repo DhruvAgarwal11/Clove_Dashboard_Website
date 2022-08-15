@@ -614,6 +614,7 @@ function onSubscriptionComplete(result) {
 }
 
 function createSubscription(customerId, paymentMethodId, priceId) {
+  console.log("in create subs");
   console.log(customerId);
   console.log(paymentMethodId);
   console.log(priceId);
