@@ -43,13 +43,26 @@ exports.handler = async function(event, context, callback){
     // };
   }
   else if (typeOfRequest == "create-customer"){
-    const customer = await stripe.customers.create({
-      email: event.queryStringParameters.email,
+    var customers = await stripe.customers.list({
+      // query: 'email:\''+ event.queryStringParameters.email +'\'',
+      email:event.queryStringParameters.email
     });
-    const response = {
-      statusCode: 200,
-      body: JSON.stringify(customer)
-    };
+    var response;
+    if (customers.data.length > 0){
+      response = {
+        statusCode: 200,
+        body: JSON.stringify("Black")
+      };
+    }
+    else {
+      const customer = await stripe.customers.create({
+        email: event.queryStringParameters.email,
+      });
+      response = {
+        statusCode: 200,
+        body: JSON.stringify(customer)
+      };
+    }
     return response;
   }
   else if (typeOfRequest == "search-customer"){
@@ -90,16 +103,37 @@ exports.handler = async function(event, context, callback){
     return response;
   }
   else if (typeOfRequest == "create-usage-record"){
+    console.log(event.queryStringParameters.subscriptionItems);
     console.log(event.queryStringParameters.newQuantity);
-    const usageRecord = await stripe.subscriptionItems.createUsageRecord(
-      event.queryStringParameters.subscriptionItems,
-      {quantity: event.queryStringParameters.newQuantity, timestamp: event.queryStringParameters.timestamp}
-    );
-    const response = {
-      statusCode: 200,
-      body: JSON.stringify(usageRecord)
-    };
-    return response;
+
+    var invoice = await stripe.invoices.list({
+      customer: event.queryStringParameters.customerId,
+    });
+    console.log(invoice);
+    if (invoice.data.length > 0) {
+      console.log("logging the invoice data");
+      console.log(invoice.data[0]);
+    }
+    try{
+      if (invoice.data.length > 0 && invoice.data[0].subscription.items.data[0]['id'] == event.queryStringParameters.subscriptionItems && invoice.data[0]['created'] == event.queryStringParameters.timestamp && invoice.data[0]['amount_due'] == event.queryStringParameters.newQuantity) throw invoice.data[0];
+      const usageRecord = await stripe.subscriptionItems.createUsageRecord(
+        event.queryStringParameters.subscriptionItems,
+        {quantity: event.queryStringParameters.newQuantity, timestamp: event.queryStringParameters.timestamp}
+      );
+      const response = {
+        statusCode: 200,
+        body: JSON.stringify(usageRecord)
+      };
+      return response;
+    }
+    catch(error){
+      const response = {
+        statusCode: 200,
+        body: JSON.stringify(error)
+      };
+      return response;
+    }
+    
   }
   else if (typeOfRequest == "retrieve-customer-subscription"){
     const subscriptions = await stripe.subscriptions.list({
@@ -123,7 +157,14 @@ exports.handler = async function(event, context, callback){
   }
   else if (typeOfRequest == "create-subscription-1"){
     try {
+      var subscriptions = await stripe.subscriptions.list({
+        customer: event.queryStringParameters.customerId
+      });
+      console.log("subscriptions data length is " + subscriptions.data.length);
+      if (subscriptions.data.length > 0) throw subscriptions.data[0];
       console.log("here in create subscription");
+      console.log(event.queryStringParameters.paymentMethodId);
+      console.log(event.queryStringParameters.customerId);
       var creatingPaymentMethod = await stripe.paymentMethods.attach(event.queryStringParameters.paymentMethodId, {
         customer: event.queryStringParameters.customerId,
       });
@@ -134,18 +175,28 @@ exports.handler = async function(event, context, callback){
       return response;
     } catch (error) {
       console.log("here in create subscription error");
-      var msg = error.message;
-      console.log(msg);
+      // var msg = error.message;
+      // console.log(msg);
       const response = {
         statusCode: 200,
-        body: JSON.stringify(msg)
+        body: JSON.stringify(error)
       };
       return response;
     }
   }
   
   else if (typeOfRequest == "create-subscription-2"){
-    try {let updateCustomerDefaultPaymentMethod = await stripe.customers.update(
+    console.log("here in create subscription 2");
+    console.log(event.queryStringParameters.paymentMethodId);
+    console.log(event.queryStringParameters.customerId);
+    var paymentMethod = await stripe.paymentMethods.retrieve(
+      event.queryStringParameters.paymentMethodId
+    );
+    
+    try {
+      console.log("payment data length is " + paymentMethod.data.length);
+      if (paymentMethod.data.length > 0) throw paymentMethod.data[0];
+      let updateCustomerDefaultPaymentMethod = await stripe.customers.update(
       event.queryStringParameters.customerId,
       {
         invoice_settings: {
@@ -161,11 +212,11 @@ exports.handler = async function(event, context, callback){
     }
     catch(error){
       console.log("here in create subscription error 2");
-      var msg = error.message;
-      console.log(msg);
+      // var msg = error.message;
+      // console.log(msg);
       const response = {
           statusCode: 200,
-          body: JSON.stringify(msg)
+          body: JSON.stringify(error)
         };
       return response;
     }
@@ -173,28 +224,45 @@ exports.handler = async function(event, context, callback){
   else if (typeOfRequest == "create-subscription-3"){
     var subscription;
     console.log(event.queryStringParameters.customerId);
-    if (event.queryStringParameters.priceId == "ARBOR_DAY_FOUNDATION"){
-      console.log("here in create subscription 4");
-      subscription = await stripe.subscriptions.create({
-        customer: event.queryStringParameters.customerId,
-        items: [{ price: ARBOR_DAY_FOUNDATION}],
-        expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
-      }); 
+    var subscriptions = await stripe.subscriptions.list({
+      customer: event.queryStringParameters.customerId
+    });
+    
+    try {
+      console.log("subscriptions data length is " + subscriptions.data.length);
+      if (subscriptions.data.length > 0) throw subscriptions.data[0];
+      if (event.queryStringParameters.priceId == "ARBOR_DAY_FOUNDATION"){
+        console.log("here in create subscription 4");
+        subscription = await stripe.subscriptions.create({
+          customer: event.queryStringParameters.customerId,
+          items: [{ price: ARBOR_DAY_FOUNDATION}],
+          expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
+        }); 
+      }
+      else{
+        console.log("here in create subscription 5");
+        subscription = await stripe.subscriptions.create({
+          customer: event.queryStringParameters.customerId,
+          items: [{ price: RAIN_FOREST_TRUST}],
+          expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
+        }); 
+      }
+      console.log(subscription);
+      const response = {
+        statusCode: 200,
+        body: JSON.stringify(subscription)
+      };
+      return response;
     }
-    else{
-      console.log("here in create subscription 5");
-      subscription = await stripe.subscriptions.create({
-        customer: event.queryStringParameters.customerId,
-        items: [{ price: RAIN_FOREST_TRUST}],
-        expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
-      }); 
+    catch(error){
+      console.log("Error in 3");
+      const response = {
+        statusCode: 200,
+        body: JSON.stringify(error)
+      };
+      return response;
     }
-    console.log(subscription);
-    const response = {
-      statusCode: 200,
-      body: JSON.stringify(subscription)
-    };
-    return response;
+    
   }
     
   else if (typeOfRequest == "retry-invoice"){
@@ -294,10 +362,10 @@ exports.handler = async function(event, context, callback){
     };
     return response;
   }
-  const response = {
+  const response2 = {
     statusCode: 200,
     body: JSON.stringify("None Found")
   };
-  return response;
+  return response2;
 
 };

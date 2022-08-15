@@ -429,7 +429,7 @@ function createUserRecord(result){
   console.log(subItem);
   quantity = Math.round(document.getElementById("cur-balance").innerHTML * 100);
   console.log(quantity);
-  var urlAWSCreateUsageRecord = urlAWS + '&typeOfRequest=create-usage-record'  + '&subscriptionItems=' + subItem + '&newQuantity=' + quantity + '&timestamp=' + parseInt(Date.now() / 1000);
+  var urlAWSCreateUsageRecord = urlAWS + '&typeOfRequest=create-usage-record'  + '&customerId' + customerId + '&subscriptionItems=' + subItem + '&newQuantity=' + quantity + '&timestamp=' + parseInt(Date.now() / 1000);
     return fetch(urlAWSCreateUsageRecord, {method: "get",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
       console.log(response);
       return response.json(); 
@@ -626,7 +626,6 @@ function createSubscription(customerId, paymentMethodId, priceId) {
   console.log("here in create subscription 0");
   return fetch(urlAWSCreateSubscription, {method: "get",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
     console.log("here in create subscription 1");
-    return response.json(); 
   })
   .then((result) => {
     var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription-2' + '&priceId=' + priceId  + '&customerId=' + customerId + '&paymentMethodId=' + paymentMethodId;
@@ -691,6 +690,7 @@ function createSubscription(customerId, paymentMethodId, priceId) {
       // No more actions required. Provision your service for the user.
       .then(onSubscriptionComplete)
       .catch((error) => {
+        
         // An error has happened. Display the failure to the user here.
         // We utilize the HTML element we created.
         displayError(error);
