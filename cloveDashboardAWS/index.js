@@ -9,7 +9,16 @@ var STRIPE_SECRET_KEY="sk_live_51LV1ErJLT225WxyGqVF0biBoumF19vXI0qbH7qMOymrpYVjx
 var STRIPE_WEBHOOK_SECRET="whsec_a023ed719faf2ac2ce973e9d61eebb36f008a49da246173a045d6cd033e9d558"
 
 exports.handler = async function(event, context, callback){
-
+  // const response2 = {
+  //     statusCode: 200,
+  //     headers: {
+  //           "Access-Control-Allow-Headers" : "Content-Type",
+  //           "Access-Control-Allow-Origin": "https://dashboard.joinclove.org",
+  //           "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+  //       },
+  //     body: JSON.stringify("hi")
+  //   };
+  // return response2;
   var typeOfRequest = '';
   // var donationAmount = 0;
   if (event.hasOwnProperty('queryStringParameters') && event.queryStringParameters != null && event.queryStringParameters.hasOwnProperty('typeOfRequest')){
@@ -20,6 +29,11 @@ exports.handler = async function(event, context, callback){
   if (typeOfRequest == "config"){
     const response = {
       statusCode: 200,
+      // headers: {
+      //       "Access-Control-Allow-Headers" : "Content-Type",
+      //       "Access-Control-Allow-Origin": "https://dashboard.joinclove.org",
+      //       "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+      //   },
       body: JSON.stringify(STRIPE_PUBLISHABLE_KEY)
     };
     return response;
@@ -43,7 +57,7 @@ exports.handler = async function(event, context, callback){
       // query: 'email:\''+ event.queryStringParameters.email +'\'',
       email:event.queryStringParameters.email
     });
-    var ret = customers.data[0];
+    var ret = customers;
     const response = {
       statusCode: 200,
       body: JSON.stringify(ret)
@@ -51,7 +65,7 @@ exports.handler = async function(event, context, callback){
     return response;
   }
   else if (typeOfRequest == "get-priceId"){
-    const priceId=event.queryStringParameters.priceId;
+    var priceId=event.queryStringParameters.priceId;
     if (ARBOR_DAY_FOUNDATION == priceId){
       priceId = "Arbor Day Foundation"
     }
@@ -65,10 +79,10 @@ exports.handler = async function(event, context, callback){
     return response;
   }
   else if (typeOfRequest == "get-paymentId"){
-    const paymentMethods = await stripe.customers.listPaymentMethods(
-      event.queryStringParameters.customerId,
-      {type: 'card'}
-    );
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: event.queryStringParameters.customer,
+      type: 'card'
+    });
     const response = {
       statusCode: 200,
       body: JSON.stringify(paymentMethods)
@@ -78,7 +92,7 @@ exports.handler = async function(event, context, callback){
   else if (typeOfRequest == "create-usage-record"){
     const usageRecord = await stripe.subscriptionItems.createUsageRecord(
       event.queryStringParameters.subscriptionItems,
-      {quantity: event.queryStringParameters.quantity, timestamp: event.queryStringParameters.timestamp}
+      {quantity: event.queryStringParameters.newuantity, timestamp: event.queryStringParameters.timestamp}
     );
     const response = {
       statusCode: 200,
@@ -128,11 +142,26 @@ exports.handler = async function(event, context, callback){
       }
     );
     // Create the subscription
-    const subscription = await stripe.subscriptions.create({
-      customer: event.queryStringParameters.customerId,
-      items: [{ price: (event.queryStringParameters.priceId == "ARBOR_DAY_FOUNDATION")?ARBOR_DAY_FOUNDATION:RAIN_FOREST_TRUST}],
-      expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
-    }); 
+    var subscription;
+    if (event.queryStringParameters.priceId == "ARBOR_DAY_FOUNDATION"){
+      subscription = await stripe.subscriptions.create({
+        customer: event.queryStringParameters.customerId,
+        items: [{ price: ARBOR_DAY_FOUNDATION}],
+        expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
+      }); 
+    }
+    else{
+      subscription = await stripe.subscriptions.create({
+        customer: event.queryStringParameters.customerId,
+        items: [{ price: RAIN_FOREST_TRUST}],
+        expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
+      }); 
+    }
+    // const subscription = await stripe.subscriptions.create({
+    //   customer: event.queryStringParameters.customerId,
+    //   items: [{ price: (event.queryStringParameters.priceId == "ARBOR_DAY_FOUNDATION")?ARBOR_DAY_FOUNDATION:RAIN_FOREST_TRUST}],
+    //   expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
+    // }); 
     const response = {
       statusCode: 200,
       body: JSON.stringify(subscription)
@@ -200,7 +229,7 @@ exports.handler = async function(event, context, callback){
     );
     const response = {
       statusCode: 200,
-      body: JSON.stringify(deletedSubscription)
+      body: JSON.stringify("done")
     };
     return response;
   }
