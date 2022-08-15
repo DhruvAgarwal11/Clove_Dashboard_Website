@@ -632,7 +632,8 @@ function createSubscription(customerId, paymentMethodId, priceId) {
     return response.json(); 
   })})
   .then((result) => {
-    var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription-3'  + '&priceId=' + priceId;
+   
+    var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription-3'  + '&priceId=' + priceId  + '&customerId=' + customerId;
   return fetch(urlAWSCreateSubscription, {method: "get",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
     console.log("here in create subscription 3");
     return response.json(); 
