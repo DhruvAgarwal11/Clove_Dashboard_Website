@@ -622,21 +622,21 @@ function createSubscription(customerId, paymentMethodId, priceId) {
   console.log(priceId);
   console.log(subscriptionId);
   if (subscriptionId != null) cancelSubscription();
-  var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription-1'  + '&customerId=' + customerId;
+  var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription-1' + '&priceId=' + priceId  + '&customerId=' + customerId + '&paymentMethodId=' + paymentMethodId;
   console.log("here in create subscription 0");
   return fetch(urlAWSCreateSubscription, {method: "get",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
     console.log("here in create subscription 1");
     return response.json(); 
   })
   .then((result) => {
-    var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription-2'  + '&paymentMethodId=' + paymentMethodId;
+    var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription-2' + '&priceId=' + priceId  + '&customerId=' + customerId + '&paymentMethodId=' + paymentMethodId;
   return fetch(urlAWSCreateSubscription, {method: "get",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
     console.log("here in create subscription 2");
     return response.json(); 
   })})
   .then((result) => {
    
-    var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription-3'  + '&priceId=' + priceId  + '&customerId=' + customerId;
+    var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription-3'  + '&priceId=' + priceId  + '&customerId=' + customerId + '&paymentMethodId=' + paymentMethodId;
   return fetch(urlAWSCreateSubscription, {method: "get",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
     console.log("here in create subscription 3");
     return response.json(); 

@@ -90,9 +90,10 @@ exports.handler = async function(event, context, callback){
     return response;
   }
   else if (typeOfRequest == "create-usage-record"){
+    console.log(event.queryStringParameters.newQuantity);
     const usageRecord = await stripe.subscriptionItems.createUsageRecord(
       event.queryStringParameters.subscriptionItems,
-      {quantity: event.queryStringParameters.newuantity, timestamp: event.queryStringParameters.timestamp}
+      {quantity: event.queryStringParameters.newQuantity, timestamp: event.queryStringParameters.timestamp}
     );
     const response = {
       statusCode: 200,
@@ -120,20 +121,31 @@ exports.handler = async function(event, context, callback){
     };
     return response;
   }
-  else if (typeOfRequest == "create-subscription"){
+  else if (typeOfRequest == "create-subscription-1"){
     try {
-      await stripe.paymentMethods.attach(event.queryStringParameters.paymentMethodId, {
+      console.log("here in create subscription");
+      var creatingPaymentMethod = await stripe.paymentMethods.attach(event.queryStringParameters.paymentMethodId, {
         customer: event.queryStringParameters.customerId,
       });
+      const response = {
+        statusCode: 200,
+        body: JSON.stringify(creatingPaymentMethod)
+      };
+      return response;
     } catch (error) {
+      console.log("here in create subscription error");
       var msg = error.message;
+      console.log(msg);
       const response = {
         statusCode: 200,
         body: JSON.stringify(msg)
       };
       return response;
     }
-    let updateCustomerDefaultPaymentMethod = await stripe.customers.update(
+  }
+  
+  else if (typeOfRequest == "create-subscription-2"){
+    try {let updateCustomerDefaultPaymentMethod = await stripe.customers.update(
       event.queryStringParameters.customerId,
       {
         invoice_settings: {
@@ -141,9 +153,28 @@ exports.handler = async function(event, context, callback){
         },
       }
     );
-    // Create the subscription
+    const response = {
+          statusCode: 200,
+          body: JSON.stringify(updateCustomerDefaultPaymentMethod)
+        };
+      return response;
+    }
+    catch(error){
+      console.log("here in create subscription error 2");
+      var msg = error.message;
+      console.log(msg);
+      const response = {
+          statusCode: 200,
+          body: JSON.stringify(msg)
+        };
+      return response;
+    }
+  }
+  else if (typeOfRequest == "create-subscription-3"){
     var subscription;
+    console.log(event.queryStringParameters.customerId);
     if (event.queryStringParameters.priceId == "ARBOR_DAY_FOUNDATION"){
+      console.log("here in create subscription 4");
       subscription = await stripe.subscriptions.create({
         customer: event.queryStringParameters.customerId,
         items: [{ price: ARBOR_DAY_FOUNDATION}],
@@ -151,23 +182,21 @@ exports.handler = async function(event, context, callback){
       }); 
     }
     else{
+      console.log("here in create subscription 5");
       subscription = await stripe.subscriptions.create({
         customer: event.queryStringParameters.customerId,
         items: [{ price: RAIN_FOREST_TRUST}],
         expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
       }); 
     }
-    // const subscription = await stripe.subscriptions.create({
-    //   customer: event.queryStringParameters.customerId,
-    //   items: [{ price: (event.queryStringParameters.priceId == "ARBOR_DAY_FOUNDATION")?ARBOR_DAY_FOUNDATION:RAIN_FOREST_TRUST}],
-    //   expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
-    // }); 
+    console.log(subscription);
     const response = {
       statusCode: 200,
       body: JSON.stringify(subscription)
     };
     return response;
   }
+    
   else if (typeOfRequest == "retry-invoice"){
     try {
       await stripe.paymentMethods.attach(event.queryStringParameters.paymentMethodId, {
