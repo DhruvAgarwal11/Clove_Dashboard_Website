@@ -126,6 +126,7 @@ function stripeElements(publishableKey) {
 
 function displayError(event) {
   changeLoadingStateprices(false);
+  console.log("in display error");
   let displayError = document.getElementById('card-element-errors');
   if (event.error) {
     displayError.textContent = event.error.message;
@@ -618,10 +619,24 @@ function createSubscription(customerId, paymentMethodId, priceId) {
   console.log(priceId);
   console.log(subscriptionId);
   if (subscriptionId != null) cancelSubscription();
-  var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription'  + '&customerId=' + customerId + '&paymentMethodId=' + paymentMethodId + '&priceId=' + priceId;
+  var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription-1'  + '&customerId=' + customerId;
+  console.log("here in create subscription 0");
   return fetch(urlAWSCreateSubscription, {method: "get",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
+    console.log("here in create subscription 1");
     return response.json(); 
   })
+  .then((result) => {
+    var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription-2'  + '&paymentMethodId=' + paymentMethodId;
+  return fetch(urlAWSCreateSubscription, {method: "get",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
+    console.log("here in create subscription 2");
+    return response.json(); 
+  })})
+  .then((result) => {
+    var urlAWSCreateSubscription = urlAWS + '&typeOfRequest=create-subscription-3'  + '&priceId=' + priceId;
+  return fetch(urlAWSCreateSubscription, {method: "get",  headers: new Headers({'content-type': 'application/json', 'Accept': 'application/json', 'Access-Control-Allow-Headers': "Origin, Content-Type, X-Auth-Token", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS"})}).then((response) => {
+    console.log("here in create subscription 3");
+    return response.json(); 
+  })})
   // return (
     
   //   fetch('/create-subscription', {
