@@ -103,22 +103,30 @@ exports.handler = async function(event, context, callback){
     return response;
   }
   else if (typeOfRequest == "create-usage-record"){
-    console.log(event.queryStringParameters.subscriptionItems);
-    console.log(event.queryStringParameters.newQuantity);
+    // console.log(event.queryStringParameters.subscriptionItems);
+    // console.log(event.queryStringParameters.newQuantity);
+    // console.log(event.queryStringParameters.timestamp);
 
-    var invoice = await stripe.invoices.list({
-      customer: event.queryStringParameters.customerId,
-    });
-    console.log(invoice);
-    if (invoice.data.length > 0) {
-      console.log("logging the invoice data");
-      console.log(invoice.data[0]);
-    }
+    // const usageRecordSummaries = await stripe.subscriptionItems.listUsageRecordSummaries(
+    //   event.queryStringParameters.subscriptionItems,
+    //   {limit: 1}
+    // );
+    // var invoice = await stripe.invoices.list({
+    //   customer: event.queryStringParameters.customerId,
+    // });
+    // console.log(usageRecordSummaries);
+    // console.log(usageRecordSummaries.data[0].period);
+    // if (invoice.data.length > 0) {
+    //   console.log("logging the invoice data");
+    //   console.log(invoice.data[0]);
+    // }
     try{
-      if (invoice.data.length > 0 && invoice.data[0].subscription.items.data[0]['id'] == event.queryStringParameters.subscriptionItems && invoice.data[0]['created'] == event.queryStringParameters.timestamp && invoice.data[0]['amount_due'] == event.queryStringParameters.newQuantity) throw invoice.data[0];
+      //invoice.data[0].subscription.items.data[0]['id'] == event.queryStringParameters.subscriptionItems
+      //invoice.data.length > 0 &&
+      // if ( invoice.data[0]['created'] == event.queryStringParameters.timestamp && invoice.data[0]['amount_due'] == event.queryStringParameters.newQuantity) throw invoice.data[0];
       const usageRecord = await stripe.subscriptionItems.createUsageRecord(
         event.queryStringParameters.subscriptionItems,
-        {quantity: event.queryStringParameters.newQuantity, timestamp: event.queryStringParameters.timestamp}
+        {quantity: (event.queryStringParameters.newQuantity/2), timestamp: event.queryStringParameters.timestamp}
       );
       const response = {
         statusCode: 200,
