@@ -422,6 +422,8 @@ function getInvoices(customerId){
 }
 
 function createUserRecord(result){
+  console.log("in create usage record");
+
   console.log(result);
   subItem = result.subscription.items.data[0].id;
   console.log(subItem);
