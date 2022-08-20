@@ -1,25 +1,6 @@
-# Subscriptions with metered usage
+# Clove Dashboard Website
 
-An [Express server](http://expressjs.com) implementation.
+Clove is a free extension that makes offsetting carbon emissions from online purchases simple and easy!
 
-## Requirements
+Check out this website at [dashboard.joinclove.org](https://dashboard.joinclove.org). If you haven't already downloaded the chrome extension, visit [this link] (https://chrome.google.com/webstore/detail/clove-carbon-offset-for-o/ngbohkoofgapiedfbnbnbondgpldgcba).
 
-- Node v10+
-- [Configured .env file](../../../README.md#env-config)
-
-
-## How to run
-
-1. Install dependencies
-
-```
-npm install
-```
-
-2. Run the application
-
-```
-npm start
-```
-
-3. Go to `localhost:4242` to see the demo
