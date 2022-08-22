@@ -1,12 +1,12 @@
 const Stripe = require('stripe');
-const stripe = Stripe('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'); //stripe secret test key
+const stripe = Stripe(''); //stripe secret live key
 //Lambda function
-var ARBOR_DAY_FOUNDATION="price_1LW4z5JLT225WxyGRrX1TcQd"
-var RAIN_FOREST_TRUST="price_1LW4xqJLT225WxyG7OaExFAj"
-var STATIC_DIR="docs"
-var STRIPE_PUBLISHABLE_KEY="pk_live_51LV1ErJLT225WxyGX7ucx2fxyyfJPZsesEH7m8sn8i8GIST7UIyGns22l6GT5o0Yc0cSwor2jfzsVofbAqCSEhI600y8VJa2A0"
-var STRIPE_SECRET_KEY="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"
-var STRIPE_WEBHOOK_SECRET="whsec_a023ed719faf2ac2ce973e9d61eebb36f008a49da246173a045d6cd033e9d558"
+var ARBOR_DAY_FOUNDATION=""//arbor day foundation pricing starting with price_1LW4z5J
+var RAIN_FOREST_TRUST=""//rain forest trust pricing starting with price_1LW4xq
+var STATIC_DIR=""//folder
+var STRIPE_PUBLISHABLE_KEY=""//the stripe publishable key starting with pk_live
+var STRIPE_SECRET_KEY=""//the stripe secret key starting with sk_live
+var STRIPE_WEBHOOK_SECRET="" //the stripe webhook secret starting with whsec
 
 exports.handler = async function(event, context, callback){
   // const response2 = {
